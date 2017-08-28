@@ -3,6 +3,7 @@ import {connect} from 'react-redux'
 import {StyleSheet, View, Text, Geolocation} from 'react-native'
 import MapView from 'react-native-maps';
 import {getLocation} from '../actions'
+import LoadingView from './LoadingView'
 
 let i = 0;
 class MainScreen extends Component {
@@ -17,10 +18,11 @@ class MainScreen extends Component {
     render() {
         i++;
         console.log("render", i);
-        console.log(this);
         return (
             <View style={styles.container}>
-                <Text style={styles.text}>{this.props.data}</Text>
+
+                {this.renderLoadingView(this.props.loading)}
+                {this.renderAddress(this.props.position)}
                 <MapView
                     style={{
                         height: 200,
@@ -34,8 +36,21 @@ class MainScreen extends Component {
                     }}
                 />
             </View>
+
         )
     }
+
+    renderLoadingView = (loading) => {
+        if (loading) {
+            return (<LoadingView showLoading={true}/>);
+        }
+    };
+
+    renderAddress = (data) => {
+        if (data && data.address) {
+            return (<Text style={styles.text}>{data.address}</Text>);
+        }
+    };
 }
 
 const styles = StyleSheet.create({
@@ -44,20 +59,18 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         alignItems: "center",
         justifyContent: "center",
+        // backgroundColor: '#FF0000',
         flex: 1
     },
-    text: {
-        backgroundColor: '#00FF00'
-    }
+    text: {}
 });
 
 
 const mapStateToProps = state => {
-    console.log("mapStateToProps");
-    console.log(state);
     return {
         loading: state.weather.loading,
-        data: state.weather.data,
+        position: state.weather.position,
+        localWeather: state.weather.localWeather,
     }
 };
 
