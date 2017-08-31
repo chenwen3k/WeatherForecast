@@ -1,6 +1,6 @@
-import {Alert} from 'react-native';
+import {timestampToDate} from '../utils'
 
-export default (state = {localWeather: [], position: [], loading: false}, action) => {
+export default (state = {localWeather: {}, position: {}, loading: false, errorMsg: ""}, action) => {
     console.log(`reducer: ${action.type}`);
     switch (action.type) {
         case 'GET_LOCATION':
@@ -21,31 +21,74 @@ export default (state = {localWeather: [], position: [], loading: false}, action
             return {
                 ...state,
                 loading: false,
-                localWeather: action.data
+                currentWeather: restructureCurrentWeather(action.data)
             };
         case 'GET_POSITION_ERROR':
-            Alert.alert("Can't get your location");
             return {
                 ...state,
                 loading: false,
                 localWeather: [],
-                position: []
+                position: [],
+                errorMsg: "Can't get your location"
             };
         case 'GET_ADDRESS_ERROR':
-            Alert.alert("Can't get your address");
             return {
                 ...state,
                 loading: false,
-                position: []
+                position: [],
+                errorMsg: "Can't get your address"
             };
         case 'GET_WEATHER_ERROR':
-            Alert.alert("Can't get your weather");
             return {
                 ...state,
                 loading: false,
-                localWeather: []
+                localWeather: [],
+                errorMsg: "Can't get your weather"
             };
         default:
             return state
     }
 }
+
+const restructureCurrentWeather: Object = (currentWeather) => {
+    let structuredCurrentWeather = {};
+    if (currentWeather) {
+        if (currentWeather.weather && currentWeather.weather.length > 0) {
+            structuredCurrentWeather["weatherDesc"] = currentWeather.weather[0].main;
+            structuredCurrentWeather["weatherIcon"] = currentWeather.weather[0].icon;
+        }
+        if (currentWeather.main) {
+            structuredCurrentWeather["temp"] = currentWeather.main.temp;
+            structuredCurrentWeather["pressure"] = currentWeather.main.pressure;
+            structuredCurrentWeather["humidity"] = currentWeather.main.humidity;
+            structuredCurrentWeather["tempMin"] = currentWeather.main.temp_min;
+            structuredCurrentWeather["tempMax"] = currentWeather.main.temp_max;
+        }
+        if (currentWeather.visibility) {
+            structuredCurrentWeather["visibility"] = currentWeather.visibility;
+        }
+
+        if (currentWeather.wind && currentWeather.wind.speed) {
+            structuredCurrentWeather["windSpeed"] = currentWeather.wind.speed;
+        }
+        if (currentWeather.sys) {
+            let sunrise = currentWeather.sys.sunrise;
+            if (sunrise) {
+                structuredCurrentWeather["sunrise"] = timestampToDate(sunrise, "hh:mma");
+            }
+            let sunset = currentWeather.sys.sunset;
+            if (sunset) {
+                structuredCurrentWeather["sunset"] = timestampToDate(sunset, "hh:mma");
+            }
+        }
+    }
+    return structuredCurrentWeather;
+};
+
+const restructureWeather = (localWeather) => {
+    if (localWeather && localWeather.list && localWeather.list.length > 0) {
+        localWeather.list.forEach(item => {
+            console.log("timestampToDate", timestampToDate(item.dt, "LLLL"));
+        })
+    }
+};

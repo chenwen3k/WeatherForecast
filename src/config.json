@@ -1,7 +1,13 @@
 {
-  "APPID": "appid=766f0af078a2889c32c9ed4378317acc&units=metric",
+  "SUFFIX": {
+    "appid": "766f0af078a2889c32c9ed4378317acc",
+    "units": "metric"
+  },
   "WEATHER_URI": "https://api.openweathermap.org/data/2.5/weather",
   "FORECAST": "forecast",
-  "DAILY": "daily"
+  "DAILY": "daily",
+  "WEATHER_BG_WIDTH": 800,
+  "WEATHER_BG_HEIGHT": 480,
+  "WEATHER_ICON": "http://openweathermap.org/img/w/"
   //  ?lat=35&lon=139
 }

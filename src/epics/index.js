@@ -53,9 +53,9 @@ const getCurrentWeatherEpic = action$ =>
         .switchMap(action => {
                 console.log("getCurrentWeatherEpic!");
 
-                return weatherAjaxWrapper(`${WEATHER_URI}?lat=${action.data.latitude}&lon=${action.data.longitude}`)
+                return weatherAjaxWrapper(WEATHER_URI, {"lat": action.data.latitude, "lon": action.data.longitude})
                     .map(data => ({
-                        type: 'GET_WEATHER_SUCCESS', data: data
+                        type: 'GET_WEATHER_SUCCESS', data: data.response
                         // data: {
                         //     address: data.response.results[0].formatted_address,
                         //     latitude: action.data.latitude,

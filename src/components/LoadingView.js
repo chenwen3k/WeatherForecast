@@ -22,6 +22,7 @@ class LoadingView extends Component {
     }
 
     render() {
+        console.log("render loadingview")
         const {showLoading, opacity, backgroundColor} = this.props;
         return (
             <Modal onRequestClose={() => this._close()} visible={showLoading} transparent>
