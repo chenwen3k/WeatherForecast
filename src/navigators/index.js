@@ -1,16 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { addNavigationHelpers, StackNavigator } from 'react-navigation';
+import {connect} from 'react-redux';
+import {Platform, StatusBar} from 'react-native';
+import {addNavigationHelpers, StackNavigator} from 'react-navigation';
 
 import MainScreen from '../components/MainScreen';
 
 export const AppNavigator = StackNavigator({
-    Main: { screen: MainScreen },
-});
+        Main: {
+            screen: MainScreen
+        },
+    },
+    {
+        navigationOptions: {
+            header: null,
+        },
+    });
 
-const AppWithNavigationState = ({ dispatch, nav }) => (
-    <AppNavigator navigation={addNavigationHelpers({ dispatch, state: nav })} />
+const AppWithNavigationState = ({dispatch, nav}) => (
+    <AppNavigator navigation={addNavigationHelpers({dispatch, state: nav})}/>
 );
 
 AppWithNavigationState.propTypes = {

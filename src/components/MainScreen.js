@@ -1,18 +1,16 @@
 import React, {Component} from 'react'
-import {Alert, Animated, ScrollView} from 'react-native'
+import {Alert, Animated, ScrollView, Platform} from 'react-native'
 import {connect} from 'react-redux'
 import {Image, StyleSheet, View, Text, PixelRatio} from 'react-native'
 import MapView from 'react-native-maps';
 import {getLocation} from '../actions'
 import LoadingView from './LoadingView'
 import {screenWidth, screenHeight, timestampToDate} from '../utils'
-import {WEATHER_BG_WIDTH, WEATHER_BG_HEIGHT} from '../config.json'
+import {WEATHER_BG_WIDTH, WEATHER_BG_HEIGHT, WEATHER_ICON} from '../config.json'
 
 let i = 0;
 class MainScreen extends Component {
-    static navigationOptions = {
-        title: 'Weather forecast',
-    };
+
 
     constructor(props: any) {
         super(props);
@@ -39,7 +37,14 @@ class MainScreen extends Component {
 
     componentWillUpdate() {
         console.log("componentWillUpdate");
+        console.log("currentWeather", this.props.currentWeather);
+    }
 
+    render() {
+        i++;
+        console.log("render", i);
+        console.log("this.state.translateX", this.state.translateX);
+        console.log("in render currentWeather", this.props.currentWeather);
         if (this.props.currentWeather && !this.animationStart) {
             console.log("animationStart");
             Animated.timing(this.state.translateX, {
@@ -48,16 +53,11 @@ class MainScreen extends Component {
             }).start();
             this.animationStart = true;
         }
-    }
-
-    render() {
-        i++;
-        console.log("render", i);
-        console.log("this.state.translateX", this.state.translateX);
         return (
             <View style={styles.fullScreen}>
                 <Animated.Image
                     style={{
+                        position: "absolute",
                         width: this.bgWidth,
                         height: screenHeight,
                         transform: [{translateX: this.state.translateX}]
@@ -66,39 +66,63 @@ class MainScreen extends Component {
                     source={require("../res/image/sunny_bg.jpg")}
                 />
 
-                <View style={{
-                    width: StyleSheet.hairlineWidth,
-                    backgroundColor: "#00FFFF",
-                    position: "absolute",
-                    flexDirection: "column"
-                }}>
-                    {this.renderLocation(this.props.position)}
-                    {this.renderDivider()}
-                    <ScrollView style={styles.scrollContainer}>
-                        {this.renderLocalWeather(this.props.currentWeather)}
-                        {this.renderDivider()}
-                    </ScrollView>
-                </View>
-                <View style={styles.container}>
-                    {this.renderLoadingView(this.props.loading)}
-                    <MapView
-                        style={{
-                            height: 200,
-                            width: 200
-                        }}
-                        initialRegion={{
-                            latitude: 37.78825,
-                            longitude: -122.4324,
-                            latitudeDelta: 0.0922,
-                            longitudeDelta: 0.0421,
-                        }}
-                    />
-                </View>
+                {this.renderLocation(this.props.position)}
+                {this.renderDivider()}
+                <ScrollView>
+                    {this.renderLocalWeather(this.props.currentWeather)}
+                </ScrollView>
+                {this.renderLoadingView(this.props.loading)}
                 {this.renderErrorAlert(this.props.errorMsg)}
             </View>
-
         )
     }
+
+    renderLocation = (data) => {
+        if (data && data.address) {
+            return (
+                <View style={styles.location}>
+                    <Image source={require('../res/image/location.png')} style={{
+                        width: PixelRatio.getPixelSizeForLayoutSize(12),
+                        height: PixelRatio.getPixelSizeForLayoutSize(12),
+                    }}/>
+                    <Text style={[styles.textCommon, {
+                        marginRight: 10
+                    }]}
+                          numberOfLines={1}
+                          ellipsizeMode="tail">{data.address}</Text>
+                </View>
+            );
+        }
+    };
+
+    renderDivider = () => {
+        return (
+            <View style={{height: 1, backgroundColor: "rgba(0,0,0,0.1)",}}/>
+        );
+    };
+
+    renderLocalWeather = (currentWeather) => {
+        if (currentWeather)
+            return (
+                <View style={{alignItems: 'center'}}>
+                    <Text style={[styles.textCommon, styles.textLarge]}
+                          numberOfLines={1}
+                          ellipsizeMode="tail">{currentWeather.weatherDesc}</Text>
+
+                    {console.log(`${WEATHER_ICON}${currentWeather.weatherIcon}.png`)}
+                    <Image
+                        style={{width: 50, height: 50}}
+                        source={{uri: 'http://openweathermap.org/img/w/50n.png'}}
+                    />
+                    <Image style={{width: 40, height: 40}}
+                           source={{uri: `${WEATHER_ICON}${currentWeather.weatherIcon}.png`}}/>
+                    <Text style={styles.textCommon}
+                          numberOfLines={1}
+                          ellipsizeMode="tail">{currentWeather.weatherDesc}</Text>
+                    {this.renderDivider()}
+                </View>
+            );
+    };
 
     renderLoadingView = (loading) => {
         console.log("renderLoadingView", loading);
@@ -117,80 +141,32 @@ class MainScreen extends Component {
         }
     };
 
-    renderLocalWeather = (currentWeather) => {
-        console.log("currentWeather", currentWeather);
-        // if (localWeather && localWeather.list && localWeather.list.length > 0) {
-        //     console.log("timestampToDate", timestampToDate(localWeather.list[0].dt, "YYYYMMDD hh:MM:ss"));
-        if (currentWeather)
-            return (
-                <View style={styles.fullHorizontal}>
-                    <Text style={styles.text}
-                          numberOfLines={1}
-                          ellipsizeMode="tail">{currentWeather.weatherDesc}</Text>
-                </View>
-            );
-        // }
-    };
-
-    renderLocation = (data) => {
-        if (data && data.address) {
-            return (
-                <View style={
-                    [styles.fullHorizontal,
-                        {top: 10, left: 8, bottom: 10}
-                    ]}>
-                    <Image source={require('../res/image/location.png')} style={{
-                        width: PixelRatio.getPixelSizeForLayoutSize(12),
-                        height: PixelRatio.getPixelSizeForLayoutSize(12),
-                    }}/>
-                    <Text style={styles.text}
-                          numberOfLines={1}
-                          ellipsizeMode="tail">{data.address}</Text>
-                </View>
-            );
-        }
-    };
-
-    renderDivider = () => {
-        return (
-            <View style={{height: 1, backgroundColor: "#00FFFF", paddingLeft: 0, paddingRight: 0}}>
-            </View>
-        );                        // 'rgba(0,0,0,0.1)'}
-
-    };
 }
 
 const styles = StyleSheet.create({
     fullScreen: {
         flexDirection: 'column',
-        flex: 1,
-        backgroundColor: '#0000FF',
-    },
-    fullHorizontal: {
-        flexDirection: 'row',
-        alignItems: "center"
-    },
-    scrollContainer: {
-        flexDirection: 'column',
-        flex: 1,
-        backgroundColor: '#FF0000',
-    },
-    container: {
-        ...StyleSheet.absoluteFillObject,
-        flexDirection: 'column',
-        alignItems: "center",
-        justifyContent: "center",
-        // backgroundColor: '#FF0000',
         flex: 1
     },
-    text: {
+    location: {
+        marginTop: Platform.OS === 'ios' ? 20 + 10 : 10,
+        marginBottom: 10,
+        flexDirection: 'row',
+        paddingLeft: 10,
+        paddingRight: 10,
+        alignItems: 'center'
+    },
+    textCommon: {
         textShadowColor: 'rgba(0,0,0,0.7)',
         color: '#FFFFFF',
         backgroundColor: '#00000000',
-        left: 8,
         textShadowOffset: {width: 1, height: 1},
-        fontSize: 14,
-        textShadowRadius: 1
+        fontSize: 16,
+        textShadowRadius: 1,
+        flex: 1
+    },
+    textLarge: {
+        fontSize: 20
     }
 });
 
