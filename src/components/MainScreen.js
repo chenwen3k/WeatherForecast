@@ -11,7 +11,6 @@ import {WEATHER_BG_WIDTH, WEATHER_BG_HEIGHT, WEATHER_ICON} from '../config.json'
 let i = 0;
 class MainScreen extends Component {
 
-
     constructor(props: any) {
         super(props);
         this.bgWidth = WEATHER_BG_WIDTH / WEATHER_BG_HEIGHT * screenHeight;
@@ -70,6 +69,7 @@ class MainScreen extends Component {
                 {this.renderDivider()}
                 <ScrollView>
                     {this.renderLocalWeather(this.props.currentWeather)}
+
                 </ScrollView>
                 {this.renderLoadingView(this.props.loading)}
                 {this.renderErrorAlert(this.props.errorMsg)}
@@ -85,12 +85,12 @@ class MainScreen extends Component {
                         width: PixelRatio.getPixelSizeForLayoutSize(12),
                         height: PixelRatio.getPixelSizeForLayoutSize(12),
                     }}/>
-                    <Text style={[styles.textCommon, {
-                        marginRight: 10
-                    }]}
+                    <Text style={[styles.textCommon,
+                        {marginRight: 10, flex: 1}]}
                           numberOfLines={1}
                           ellipsizeMode="tail">{data.address}</Text>
                 </View>
+
             );
         }
     };
@@ -102,23 +102,34 @@ class MainScreen extends Component {
     };
 
     renderLocalWeather = (currentWeather) => {
-        if (currentWeather)
+        if (currentWeather && currentWeather.temp)
             return (
-                <View style={{alignItems: 'center'}}>
-                    <Text style={[styles.textCommon, styles.textLarge]}
-                          numberOfLines={1}
-                          ellipsizeMode="tail">{currentWeather.weatherDesc}</Text>
-
-                    {console.log(`${WEATHER_ICON}${currentWeather.weatherIcon}.png`)}
-                    <Image
-                        style={{width: 50, height: 50}}
-                        source={{uri: 'http://openweathermap.org/img/w/50n.png'}}
-                    />
-                    <Image style={{width: 40, height: 40}}
-                           source={{uri: `${WEATHER_ICON}${currentWeather.weatherIcon}.png`}}/>
-                    <Text style={styles.textCommon}
-                          numberOfLines={1}
-                          ellipsizeMode="tail">{currentWeather.weatherDesc}</Text>
+                <View>
+                    <View style={{flexDirection: 'row', marginTop: 20, marginLeft: 20, marginBottom: 20}}>
+                        <Text style={[styles.textCommon,
+                            styles.textLarge]}
+                              numberOfLines={1}
+                              ellipsizeMode="tail">{currentWeather.temp}°</Text>
+                        <View style={{flex: 1}}>
+                            <Text
+                                style={[styles.textCommon, {
+                                    flex: 1,
+                                    marginTop: 16,
+                                    marginLeft: 10
+                                }]}
+                                numberOfLines={1}
+                                ellipsizeMode="tail">{currentWeather.weatherDesc}</Text>
+                            <Image
+                                style={{
+                                    width: 28,
+                                    height: 28,
+                                    marginLeft: -28,
+                                    flex: 1
+                                }}
+                                source={{uri: `${WEATHER_ICON}${currentWeather.weatherIcon}.png`}}
+                            />
+                        </View>
+                    </View>
                     {this.renderDivider()}
                 </View>
             );
@@ -140,7 +151,6 @@ class MainScreen extends Component {
             }, 200);
         }
     };
-
 }
 
 const styles = StyleSheet.create({
@@ -162,11 +172,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#00000000',
         textShadowOffset: {width: 1, height: 1},
         fontSize: 16,
-        textShadowRadius: 1,
-        flex: 1
+        textShadowRadius: 1
     },
     textLarge: {
-        fontSize: 20
+        fontSize: 80
     }
 });
 

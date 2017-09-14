@@ -58,11 +58,11 @@ const restructureCurrentWeather: Object = (currentWeather) => {
             structuredCurrentWeather["weatherIcon"] = currentWeather.weather[0].icon;
         }
         if (currentWeather.main) {
-            structuredCurrentWeather["temp"] = currentWeather.main.temp;
+            structuredCurrentWeather["temp"] = currentWeather.main.temp.toFixed(0);
             structuredCurrentWeather["pressure"] = currentWeather.main.pressure;
             structuredCurrentWeather["humidity"] = currentWeather.main.humidity;
-            structuredCurrentWeather["tempMin"] = currentWeather.main.temp_min;
-            structuredCurrentWeather["tempMax"] = currentWeather.main.temp_max;
+            structuredCurrentWeather["tempMin"] = currentWeather.main.temp_min.toFixed(0);
+            structuredCurrentWeather["tempMax"] = currentWeather.main.temp_max.toFixed(0);
         }
         if (currentWeather.visibility) {
             structuredCurrentWeather["visibility"] = currentWeather.visibility;
